@@ -1,0 +1,37 @@
+## Environment
+
+Windows 11, NVIDIA GeForce RTX 4060 Laptop GPU (8 GB VRAM), driver 581.86.
+Miniconda, Python 3.11.
+
+### Installation
+
+Order matters. Installing boltz first can pull a CPU-only PyTorch build.
+
+```bash
+conda create -n boltz python=3.11 -y
+conda activate boltz
+
+# GPU-enabled PyTorch, from NVIDIA's index, not PyPI
+pip install torch --index-url https://download.pytorch.org/whl/cu124
+python -c "import torch; print(torch.cuda.is_available())"   # must print True
+
+pip install "boltz[cuda]" -U
+pip install rdkit pandas numpy scipy scikit-learn matplotlib seaborn \
+            chembl_webresource_client py3Dmol pyyaml requests
+
+# verify torch survived the boltz install
+python -c "import torch; print(torch.version.cuda, torch.cuda.is_available())"
+```
+
+`environment.yml` is provided as a record of the exact resolved versions, but
+`conda env create -f environment.yml` will install a CPU-only PyTorch, since the
+custom index URL is not preserved. Follow the steps above instead.
+
+Python 3.13 does not work: boltz pins scipy==1.13.1, which has no cp313 wheels
+and fails to build from source on Windows.
+
+### Versions
+
+- boltz: 2.0.3
+- torch: 2.6.0+cu124
+- rdkit: 2026.3.6
