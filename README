@@ -25,7 +25,7 @@ python -c "import torch; print(torch.version.cuda, torch.cuda.is_available())"
 
 `environment.yml` is provided as a record of the exact resolved versions, but
 `conda env create -f environment.yml` will install a CPU-only PyTorch, since the
-custom index URL is not preserved. Follow the steps above instead.
+custom index URL is not preserved. Follow the steps above instead. Use `conda env export --no-builds > environment.yml`
 
 Python 3.13 does not work: boltz pins scipy==1.13.1, which has no cp313 wheels
 and fails to build from source on Windows.
@@ -35,3 +35,35 @@ and fails to build from source on Windows.
 - boltz: 2.0.3
 - torch: 2.6.0+cu124
 - rdkit: 2026.3.6
+
+### Data Source
+
+Raw Data: data\raw\CHEMBL203_activities.zip
+
+Data source: ChEMBL 37, target CHEMBL203, downloaded 2026-09-24.
+NB: The EGFR target report card: https://www.ebi.ac.uk/chembl/explore/target/CHEMBL203
+
+### Processing raw input data
+
+Use the notebook `notebook/chembl_data.ipynb` to process raw ChEMBL data to a clean .csv
+
+Useful ChEMBL reference:
+    - Activity data documentation: https://chembl.gitbook.io/chembl-interface-documentation/frequently-asked-questions/chembl-data-questions
+    - webinar overview on ChEMBL database: https://www.ebi.ac.uk/training/events/chembl-workshop-drug-design/
+
+Cleaning notes:
+    - Removed invalid rows, e.g. missing pChEMBL data 
+    - Only assays which measure binding affinity by IC50 (Ki, Kd are a small minority of binding affinity measurements)
+    - Remove assays for mutants. Matches to strings in the "Assay Description"
+        T790M 4732
+        L858R 4773
+        C797S 1399
+        G719 1
+        A431 1072
+        L861Q 135
+        E746 98
+        \bexon 640
+        \bdel 2354
+        insert 97
+        mutant 4523
+        variant 0
