@@ -67,3 +67,14 @@ Cleaning notes:
         insert 97
         mutant 4523
         variant 0
+    - Rows containing smiles strings which could not be standardized are removed. These failures are tracked in `data/processed/standardization_failures.csv`.
+    - For duplicate measurements, the median pChEMBL Value is used in a cleaned data frame, saved at `data/processed/egfr_clean.csv`.
+    - Median SD 0.5 log units across compounds with ≥3 measurements. This is essentially a noise floor for predictions by Boltz-2.
+
+### Exploratory Cheminformatics
+
+Use the notebook `notebook/cheminformatics.ipynb` to explore chemiformatics on clean dataset. 
+
+    - Table of common descriptors + distribution plots
+    - Lipinski RO5 compliance
+    - Most common Bemis–Murcko scaffolds
