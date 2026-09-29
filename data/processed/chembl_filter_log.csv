@@ -1,0 +1,10 @@
+Step,N Rows,Rows Removed,N compounds,Compounds Removed
+Raw table,58847,,19118,
+"Valid row : Binding Assay, Standard Relation, Homo Sapiens, pChEMBL Value, Valid",19866,38981.0,10761,8357.0
+Drop rows with missing smiles,19866,-0.0,10761,-0.0
+"Limit the type of measurements to IC50, Ki and Kd",19544,322.0,10734,27.0
+"Assay Type, only IC50 for consistency of measure.",18123,1421.0,10424,310.0
+"Remove mutants, deletions and other variants.",9422,8701.0,6748,3676.0
+Standardized structures. See failed attempts at data/processed/standardization_failures.csv,9414,8.0,6740,8.0
+Merged duplicate measurements.,6710,2704.0,6710,30.0
+Removed non-organic entries.,6709,1.0,6709,1.0
