@@ -104,6 +104,7 @@ Use the notebook `notebook/cheminformatics.ipynb` to explore cheminformatics on 
 - Molecules classified as covalent, 4-Anilinoquinazoline-like, aminopurine-like, monocyclic or other, using SMARTS
 - Whether using the Murcko scaffold or the manual classification, these 
 groupings are strong predictors of potency. This is a lower bound of performance against which the model will be validated
+
 | Classification            |   count |   median |     std |
 |:--------------------------|--------:|---------:|--------:|
 | 4-Anilinoquinazoline-like |    1577 |     7.31 | 1.17361 |
@@ -111,4 +112,5 @@ groupings are strong predictors of potency. This is a lower bound of performance
 | Covalent                  |    1838 |     7.07 | 1.27307 |
 | Monocyclic                |      64 |     5.08 | 1.01039 |
 | Other                     |    3069 |     6.26 | 1.25205 |
+
 - Fingerprints were used to compute Tanimoto similarities on a random subset. Since the mean pairwise Tanimoto is only 0.16, the dataset is largely chemically diverse. See `figures\tanimoto_similarity_sample_heat.png` or `figures\tanimoto_similarity_sample_dist.png`
