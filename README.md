@@ -52,6 +52,8 @@ Raw Data: data\raw\CHEMBL203_activities.zip
 Data source: ChEMBL 37, target CHEMBL203, downloaded 2026-09-24.
 NB: The EGFR target report card: https://www.ebi.ac.uk/chembl/explore/target/CHEMBL203
 
+## Notebooks
+
 ### Processing raw input data
 
 Use the notebook `notebook/chembl_data.ipynb` to process raw ChEMBL data to a clean .csv
@@ -113,4 +115,19 @@ groupings are strong predictors of potency. This is a lower bound of performance
 | Monocyclic                |      64 |     5.08 | 1.01039 |
 | Other                     |    3069 |     6.26 | 1.25205 |
 
-- Fingerprints were used to compute Tanimoto similarities on a random subset. Since the mean pairwise Tanimoto is only 0.16, the dataset is largely chemically diverse. See `figures\tanimoto_similarity_sample_heat.png` or `figures\tanimoto_similarity_sample_dist.png`
+- Fingerprints were used to compute Tanimoto similarities on a random subset. Since the mean pairwise Tanimoto is only 0.16, the dataset is largely chemically diverse. See `figures/tanimoto_similarity_sample_heat.png` or `figures/tanimoto_similarity_sample_dist.png`
+- In a principal component analysis over the fingerprints, the first two components explain ~11% of the variance. The classifiers cluster on PC1/PC2, see `figures\PCA_fingerprints_pred_class.png`. Additionally, the first two components very roughly separate the low affinity molecules from the rest of the dataset, see `figures/PCA_fingerprints_pred_activity.png`
+
+### Subset selection
+
+Use the notebook `notebooks/subset_selection.ipynb` to select a subset of molecules for activity predictions by Boltz-2. 
+
+- There is a moderate indication of potency, relative to manual classification.
+
+| Potency   |   4-Anilinoquinazoline-like |   Aminopurine-like |   Covalent |   Monocyclic |   Other |
+|:----------|----------------------------:|-------------------:|-----------:|-------------:|--------:|
+| low       |                         206 |                  3 |        410 |           46 |    1269 |
+| mid       |                         938 |                 64 |        991 |           18 |    1489 |
+| high      |                         433 |                 94 |        437 |            0 |     311 |
+
+

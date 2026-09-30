@@ -3,6 +3,9 @@ TODO.md
 # Data
 data/raw/
 
+# Maybe I'm not allowed to share articles in a public repo?
+refs/
+
 # Boltz outputs
 boltz_outputs/
 *.ckpt
