@@ -1,4 +1,4 @@
-Clean InchiKey,Clean Smiles,Molecule ChEMBL ID,Acrylamide,median,std,count
+Clean InchiKey,Clean Smiles,Molecule ChEMBL ID,Acrylamide,pChEMBL Median,pChEMBL std,Activity Measurements
 XGALLCVXEZPNRQ-UHFFFAOYSA-N,COc1cc2ncnc(Nc3ccc(F)c(Cl)c3)c2cc1OCCCN1CCOCC1,CHEMBL939,False,7.81,0.9840142491616629,141
 WHZWIUHEEWZECR-UHFFFAOYSA-N,CCOc1cc2ncnc(Nc3ccc(F)c(Cl)c3)c2c2c1OCCO2,CHEMBL3806248,False,8.7,,1
 ZKBLPJNOVMNTPS-VWLOTQADSA-N,CCC(=O)N1CC[C@H](N2C(=O)N(c3cc(OC)ccc3F)Cc3cnc(Nc4ccc(N5CCN(C)CC5)c(CC)c4)nc32)C1,CHEMBL4096014,False,6.29,,1
