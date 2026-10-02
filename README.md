@@ -122,6 +122,7 @@ groupings are strong predictors of potency. This is a lower bound of performance
 
 Use the notebook `notebooks/subset_selection.ipynb` to select a subset of molecules for activity predictions by Boltz-2. 
 
+- Molecules are assigned to potency bins (low : 0-6, mid : 6-8, high : 8+)
 - There is a moderate indication of potency, relative to manual classification.
 
 | Potency   |   4-Anilinoquinazoline-like |   Aminopurine-like |   Covalent |   Monocyclic |   Other |
@@ -130,4 +131,8 @@ Use the notebook `notebooks/subset_selection.ipynb` to select a subset of molecu
 | mid       |                         938 |                 64 |        991 |           18 |    1489 |
 | high      |                         433 |                 94 |        437 |            0 |     311 |
 
-
+- 15 molecules are selected per potency group. These selections are stratified by chemotype using rdkits's `MinMaxPicker` over the fingerprints (Morgan).
+- 6 well-known drugs targeting EGFR are added to the subset. They span 4 binding types (type I, type II, type $1\tfrac{1}{2}$ and type VI (covalent); allosteric binding types are not included). A reference complex is available from the PDB for each binding type. Two of the drugs are covalent binders with no available experimental structure.
+- Note: orininally, one additional covalent binder was included in the known references. Pelitinib was removed after matching the Clean InchiKey failed between the main and reference dataframes. This could indictate an issue with the protocol for standardization from Smiles. This will be ignored for now.
+- Decoys are added so the set includes approximate nonbinders. DUD-E decoys are sometimes identified as nonbinders using physicochemical properties alone. Instead, binders with *very* low activities are used as inactive decoys instead. These were matched on physicochemical properties. 
+- The inactives (i.e. decoys) which are analogues of actives were removed using fingerprint similarity
