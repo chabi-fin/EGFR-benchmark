@@ -21,7 +21,7 @@ conda create -n boltz python=3.11 -y
 conda activate boltz
 
 # GPU-enabled PyTorch, from NVIDIA's index, not PyPI
-pip install torch --index-url https://download.pytorch.org/whl/cu124
+python -m pip install torch --index-url https://download.pytorch.org/whl/cu124 --force-reinstall --no-cache-dir
 python -c "import torch; print(torch.cuda.is_available())"   # must print True
 
 pip install "boltz[cuda]" -U
@@ -135,6 +135,16 @@ Use the notebook `notebooks/subset_selection.ipynb` to select a subset of molecu
 - 6 well-known drugs targeting EGFR are added to the subset. They span 4 binding types (type I, type II, type $1\tfrac{1}{2}$ and type VI (covalent); allosteric binding types are not included). A reference complex is available from the PDB for each binding type. Two of the drugs are covalent binders with no available experimental structure.
 - Note: orininally, one additional covalent binder was included in the known references. Pelitinib was removed after matching the Clean InchiKey failed between the main and reference dataframes. This could indictate an issue with the protocol for standardization from Smiles. This will be ignored for now.
 - Decoys/Inactives are added so the set includes approximate nonbinders. DUD-E decoys are sometimes identified as nonbinders using physicochemical properties alone. Instead, binders with *very* low activities are used as inactive decoys instead. These were matched on physicochemical properties. 
-- Removed inactives (i.e. decoys) which are analogues of actives using fingerprint similarity
-- Total of 51 molecules in the subset
+- Removed inactives (i.e. decoys) which are analogues of actives using fingerprint similarity, and selected 10 randomly for the subset
+- Total of 61 molecules in the subset
+
+### Prepare Boltz inputs
+
+Use the notebook `notebooks/boltz_inputs.ipynb` to prepare inputs for Boltz-2.
+
+- Obtained EGFR sequence from UniProt `P00533`, shifting sequence indexing to exclude the signal peptide and account for 1-indexing residue numbering.
+- Selected the kinase domain from full EFGR as residues [672-998]. The selection is based on the erlotinib complex. Alignment was verified using several key residues. ref: Stamos et al. 2002 Structure.
+- Yaml files were prepared using the fixed sequence and the selected subset (see above). One yaml per compound (61).
+- An initial run on CHEMBL104 was used to get the MSA sequence. Subsequent yaml files point to this precomputed MSA file. 
+- The subset compounds are drawn in batches and stored at `figures/boltz_subset_mols` for convenience. 
 
