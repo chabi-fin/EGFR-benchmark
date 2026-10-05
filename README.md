@@ -148,3 +148,14 @@ Use the notebook `notebooks/boltz_inputs.ipynb` to prepare inputs for Boltz-2.
 - An initial run on CHEMBL104 was used to get the MSA sequence. Subsequent yaml files point to this precomputed MSA file. 
 - The subset compounds are drawn in batches and stored at `figures/boltz_subset_mols` for convenience. 
 
+### Run Boltz predictions
+
+As above, use the notebook `notebooks/boltz_inputs.ipynb` to prepare inputs for Boltz-2.
+
+- The human EGFR sequence was downloaded from UNIPROT. The sequence was truncated to the kinase domain [672–998], mimicking the numbering of the erlotinib complex (PDB: 1M17). Sequence alignment accounts for 1-indexing and signal peptide, and was verified against several key peptides.
+- The clean smiles of each compound in the boltz subset and the kinase domain sequence were written to yaml files (total=61).
+- A depiction of each molecule in the subset was drawn and summarized. See `figures/boltz_subset_mols/bolzs_subset_pag[1-11]
+- Each compound + the kinase sequence were written to a yaml input file.
+- The flags `--use_msa_server` and `--no_kernels` were used after troubleshooting a test prediction run. See notebook for details.
+- The total runtime for the subset predictions was [TO DO]
+
