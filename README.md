@@ -41,7 +41,7 @@ Python 3.13 does not work: boltz pins scipy==1.13.1, fails to build from source 
 
 ### Versions
 
-- boltz: 2.0.3
+- boltz: 2.2.1
 - torch: 2.6.0+cu124
 - rdkit: 2026.3.6
 
@@ -154,8 +154,20 @@ As above, use the notebook `notebooks/boltz_inputs.ipynb` to prepare inputs for 
 
 - The human EGFR sequence was downloaded from UNIPROT. The sequence was truncated to the kinase domain [672–998], mimicking the numbering of the erlotinib complex (PDB: 1M17). Sequence alignment accounts for 1-indexing and signal peptide, and was verified against several key peptides.
 - The clean smiles of each compound in the boltz subset and the kinase domain sequence were written to yaml files (total=61).
-- A depiction of each molecule in the subset was drawn and summarized. See `figures/boltz_subset_mols/bolzs_subset_pag[1-11]
+- A depiction of each molecule in the subset was drawn and summarized. See `figures/boltz_subset_mols/boltzs_subset_page[01-11].png
 - Each compound + the kinase sequence were written to a yaml input file.
 - The flags `--use_msa_server` and `--no_kernels` were used after troubleshooting a test prediction run. See notebook for details.
-- The total runtime for the subset predictions was [TO DO]
+- Some predictions fail due to memory allocation errors. The batch run was restarted with the flag `--overwrite` until all the predictions were completed.
+- The runtime for the subset predictions were written to `data/processed/runtime_log.csv`. This contains several outliers due to long idle time (CHEMBL3915508, t=76529 s) or restarted calculations on completed predictions (e.g. CHEMBL271410, 9.0s). Most computations needed ~5-15 minutes.
+- Only one prediction computation failed, which was excluded from the subset (CHEMBL58)
 
+### Evaluate Boltz predictions
+
+Use the notebook `notebooks/evaluate_predictions.ipynb` to parse the Boltz-2 predictions.
+
+- Affinity predictions and confidence estimations were extracted from Boltz prediction JSON files into a dataframe.
+- The affinity predictions (IC50 [µM]) were converted to pIC50. 
+- The table of compounds + prediction and confidence estimations are in `data/processed/boltz_preds.csv`
+- The correlation between predicted and experimental pIC50 values were assessed using Pearson and Spearman correlations. Bootstrapping was used to generate a confidence interval for each, with Pearson: 0.34 [0.10, 0.60], p: 0.01 and Spearman: 0.23 [-0.02, 0.49], p: 0.10. At this sample size (50), the data cannot distinguish a genuine moderate correlation to no correlation at all on compound ranking. 
+- Scatter plot of prediciton vs. measurement (noncovalent)
+![Scatter plot of prediciton vs. measurement (noncovalent)](figures/pred_vs_exp_covalent.png)
