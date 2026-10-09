@@ -6,6 +6,20 @@
 
 **Deliverable:** Reproducible Jupyter notebooks + README in a public GitHub repo.
 
+**Key findings:**
+1) On a structurally diverse set of 50 EGFR inhibitors, **Boltz-2's affinity
+predictions ranked compounds less accurately** than simple cheminformatics
+baselines. A nearest-neighbour lookup on Morgan fingerprints achieved Spearman
+rho = 0.78 (95% CI [0.56,0.88]) against 0.23 (95% CI [-0.02,0.49]) for Boltz-2. The gap widened for novel chemistry: restricted to compounds with low similarity to the reference set, Boltz-2 showed no positive correlation (rho = -0.13, n = 17) while the fingerprint baseline retained rho = 0.49. *I suspect the poor performance of Boltz-2 on this target is related to the multiple binding modes of EGFR inhibitors.*
+    
+    > Note that the fingerprint baselines had access to measured potencies for
+6,000+ EGFR compounds, while Boltz-2 predicted from structure alone. The
+comparison reflects practical utility on a well-characterised target rather
+than a like-for-like test of predictive capability.
+
+2) **Boltz-2 potency predictions are compressed towards the mean**. Residuals correlate strongly with experimental potency (rho = -0.79, 95% CI [-0.87, -0.67]): the weakest compounds are overpredicted by a median of 1.1 log units and the most potent underpredicted by 1.7, with the model unbiased only around pChEMBL 6. This compression limits ranking performance directly.
+
+
 ## Environment
 
 Windows 11, NVIDIA GeForce RTX 4060 Laptop GPU (8 GB VRAM), driver 581.86.
@@ -138,21 +152,11 @@ Use the notebook `notebooks/subset_selection.ipynb` to select a subset of molecu
 - Removed inactives (i.e. decoys) which are analogues of actives using fingerprint similarity, and selected 10 randomly for the subset
 - Total of 61 molecules in the subset
 
-### Prepare Boltz inputs
+### Prepare and run Boltz predictions
 
-Use the notebook `notebooks/boltz_inputs.ipynb` to prepare inputs for Boltz-2.
+As above, use the notebook `notebooks/boltz_inputs.ipynb` to prepare and run inputs for Boltz-2.
 
-- Obtained EGFR sequence from UniProt `P00533`, shifting sequence indexing to exclude the signal peptide and account for 1-indexing residue numbering.
-- Selected the kinase domain from full EFGR as residues [672-998]. The selection is based on the erlotinib complex. Alignment was verified using several key residues. ref: Stamos et al. 2002 Structure.
-- Yaml files were prepared using the fixed sequence and the selected subset (see above). One yaml per compound (61).
-- An initial run on CHEMBL104 was used to get the MSA sequence. Subsequent yaml files point to this precomputed MSA file. 
-- The subset compounds are drawn in batches and stored at `figures/boltz_subset_mols` for convenience. 
-
-### Run Boltz predictions
-
-As above, use the notebook `notebooks/boltz_inputs.ipynb` to prepare inputs for Boltz-2.
-
-- The human EGFR sequence was downloaded from UNIPROT. The sequence was truncated to the kinase domain [672–998], mimicking the numbering of the erlotinib complex (PDB: 1M17). Sequence alignment accounts for 1-indexing and signal peptide, and was verified against several key peptides.
+- The human EGFR sequence was downloaded from UNIPROT (`P00533`). The sequence was truncated to the kinase domain [672–998], mimicking the numbering of the erlotinib complex (PDB: 1M17). Sequence alignment accounts for 1-indexing and signal peptide, and was verified against several key peptides.ref: Stamos et al. 2002 Structure.
 - The clean smiles of each compound in the boltz subset and the kinase domain sequence were written to yaml files (total=61).
 - A depiction of each molecule in the subset was drawn and summarized. See `figures/boltz_subset_mols/boltzs_subset_page[01-11].png
 - Each compound + the kinase sequence were written to a yaml input file.
@@ -168,6 +172,31 @@ Use the notebook `notebooks/evaluate_predictions.ipynb` to parse the Boltz-2 pre
 - Affinity predictions and confidence estimations were extracted from Boltz prediction JSON files into a dataframe.
 - The affinity predictions (IC50 [µM]) were converted to pIC50. 
 - The table of compounds + prediction and confidence estimations are in `data/processed/boltz_preds.csv`
-- The correlation between predicted and experimental pIC50 values were assessed using Pearson and Spearman correlations. Bootstrapping was used to generate a confidence interval for each, with Pearson: 0.34 [0.10, 0.60], p: 0.01 and Spearman: 0.23 [-0.02, 0.49], p: 0.10. At this sample size (50), the data cannot distinguish a genuine moderate correlation to no correlation at all on compound ranking. 
-- Scatter plot of prediciton vs. measurement (noncovalent)
+- The correlation between predicted and experimental pIC50 values were assessed using Pearson and Spearman correlations. Bootstrapping was used to generate a confidence interval for each, with Pearson: 0.34 with a confidence interval (CI) = [0.10, 0.60], p: 0.01 and Spearman: 0.23 CI = [-0.02, 0.49], p: 0.10. At this sample size (50), the data cannot distinguish a genuine moderate correlation to no correlation at all on compound ranking. 
+- Scatter plot of prediciton vs. measurement (noncovalent). The uncertainty in the experimental values is shown in the shaded region. Color represents the Botlz-2 prediction on whether the ligand is a binder or nonbinder. 
 ![Scatter plot of prediciton vs. measurement (noncovalent)](figures/pred_vs_exp_covalent.png)
+- ROC-AUC on the affinity probability binary with a cut off of 7 results in AUC 0.66 CI = [0.49, 0.80], (n=50, 16 positives). The lower bound sits at the random classifier values, suggesting weak discriminative ability. The result is not distinguishable from chance at this small sample size.   
+![ROC-AUC for Boltz-2 binding prediction, $p\text{ChEMBL}_{\text{cut off}}=7$](figures/roc_auc.png)
+- Boltz-2 beats the trivial benchmarks of heavy atoms (Spearman: 0.08) and molecular weight (Spearman: 0.06). Molecular size is a poor predictor of binding for this set, since the set was constructed by maximizing structural diversity and stratification into potency bins. 
+- Boltz-2 is out performed by a QSAR baseline. A random forest on Morgan fingerprints, trained on the remaining ChEMBL data with the 40-compound subset held out, results in Spearman 0.76 CI = [0.59, 0.86]. Many compounds in the subset have close analogues in the training set. The Tanimoto similarity is only low within the subset. 
+- Nearest Neighbor similarity outperforms Boltz-2 and matches performance to the random forest, Spearman 0.78 CI = [0.56, 0.88]. In this case, the pChEMBL of the test set is assigned the pChEMBL of the most Tanimoto-similar training compound. 
+- Both Boltz-2 and Random forrest depend on chemical familiarity. Boltz-2 loses all its predictive power when there are no analogues in the training set. 
+![Correlation depends on inclusion of analogues](figures/Boltz2_RF_Tanimoto_similarity.png)
+
+### Conclusion: The structural modelling by Boltz-2 performs poorly compared to cheminformatics modelling based in substructures for the target EGFR. 
+
+I would suspect that the structural modelling by Boltz-2 would give a predictive edge over cheminformatics / substructure modelling, *where the chemisty is novel*. However, that is not supported by the evaluation here. Any predictive power Boltz-2 may have for this target, disappears when the analogues are removed. Far cheaper cheminformatics baselines outperform Boltz-2, with and without analogues, for this target. A larger data set is needed for more conclusive statements. 
+
+The low performance may be in part due to the diverse set of possible binding modes in EGFR. Others previously found Boltz-2 has low performance if the target lacks a well-defined binding pocket. **Therefore, I recommend against trusting Boltz-2 binding predictions in targets with multiple binding modes.** 
+ref: [Wan et al. 2026 On the Reliability of AI Methods in Drug Discovery: Evaluation of Boltz-2 for Structure and Binding Affinity Prediction] 
+
+While investigating whether Boltz-2 systematically underpredicts covalent bonds, I notices systematic regression towards the mean. There is clear negative correlation (Spearman -0.79, CI [-0.87,-0.67]) between experimental potency and the prediction residuals (predicted − experimental pChEMBL). **The weakest compounds are overpredicted by a median of one log unit, while the most potent are underpredicted by 1.7 log units**
+![Correlation of experimental potency vs. residual potency](figures/exp_vs_residual_potency.png)
+- The residuals decline monotonically across potency quadrents. The weakest compounds are overpredicted by a median of one log unit, while the most potent are underpredicted by 1.7.
+
+| Experimental pChEMBL   |   n |   Median residual |
+|:-----------------------|----:|------------------:|
+| 4.0 – 5.3              |  18 |              1.06 |
+| 5.3 – 6.7              |  16 |             -0.71 |
+| 6.7 – 8.1              |  12 |             -0.83 |
+| 8.1 – 9.4              |  14 |             -1.67 |
